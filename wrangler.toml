@@ -1,0 +1,8 @@
+name = "fal-hafez-bot"
+main = "src/index.js"
+compatibility_date = "2025-05-01"
+account_id = "987cc653e1b1ffbe796483b67fd385c9"
+workers_dev = true
+
+[vars]
+ADMIN_KEY = "falhafez-admin-2026"
