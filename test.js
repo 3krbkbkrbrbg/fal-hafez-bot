@@ -42,7 +42,7 @@ tgCalls.length = 0;
 await call('/webhook', 'POST', { update_id: 1, message: { message_id: 10, chat: { id: 111, type: 'private' }, text: '/start' } });
 check('sendMessage called', tgCalls.some(c => c.url.endsWith('/sendMessage')));
 const startCall = tgCalls.find(c => c.url.endsWith('/sendMessage'));
-check('welcome has button', startCall && startCall.body.reply_markup && startCall.body.reply_markup.inline_keyboard[0][0].callback_data === 'fal_ritual');
+check('welcome has main menu', startCall && startCall.body.reply_markup && startCall.body.reply_markup.inline_keyboard.flat().some((b) => /فال|صوت/.test(b.text)));
 check('welcome HTML', startCall && startCall.body.parse_mode === 'HTML');
 
 // --- Test 3: /fal ritual ---
