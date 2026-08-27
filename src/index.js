@@ -147,8 +147,10 @@ export default {
     const path = url.pathname;
 
     // GET /setup?key=... → register webhook + bot info (Worker→Telegram works)
+    //   ?action=delete → only delete the current bot's webhook (revert to no-handler state)
     if (request.method === 'GET' && path === '/setup') {
       const key = url.searchParams.get('key');
+      const action = url.searchParams.get('action') || 'set';
       const token = env.TG_BOT_TOKEN;
       if (!token) {
         return new Response('{"ok":false,"error":"TG_BOT_TOKEN not set"}', { headers: { 'content-type': 'application/json' } });
@@ -156,11 +158,22 @@ export default {
       if (key !== (env.ADMIN_KEY || ADMIN_KEY)) {
         return new Response('{"ok":false,"error":"bad key"}', { status: 403, headers: { 'content-type': 'application/json' } });
       }
+
+      // Always clear any pre-existing webhook/project first (idempotent, safe).
+      const del = await tgApi(token, 'deleteWebhook', { drop_pending_updates: false });
+      const delJ = await del.json();
+
+      if (action === 'delete') {
+        const me = await tgApi(token, 'getMe', {});
+        const body = { ok: true, action: 'delete', deleteWebhook: delJ, getMe: await me.json() };
+        return new Response(JSON.stringify(body, null, 2), { headers: { 'content-type': 'application/json' } });
+      }
+
       const webhookUrl = url.origin + '/webhook';
       const set = await tgApi(token, 'setWebhook', { url: webhookUrl });
       const me = await tgApi(token, 'getMe', {});
       const meJ = await me.json();
-      const body = { ok: true, webhook_url: webhookUrl, setWebhook: await set.json(), getMe: meJ };
+      const body = { ok: true, webhook_url: webhookUrl, deleteWebhook: delJ, setWebhook: await set.json(), getMe: meJ };
       return new Response(JSON.stringify(body, null, 2), { headers: { 'content-type': 'application/json' } });
     }
 
