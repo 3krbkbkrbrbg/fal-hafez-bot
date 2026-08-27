@@ -4,7 +4,7 @@
 import { POEMS, randomFal } from './data.js';
 
 const TG = 'https://api.telegram.org';
-const ADMIN_KEY = 'falhafez-admin-2026'; // also set as var; guarded in setup
+const ADMIN_KEY = ''; // overridden by wrangler.toml [vars]; guarded in setup
 
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
