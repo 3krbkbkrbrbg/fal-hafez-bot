@@ -6,3 +6,6 @@ workers_dev = true
 
 [vars]
 ADMIN_KEY = "d07a2665faf1e54d79cd053347cfe2c4"
+
+[ai]
+binding = "AI"
